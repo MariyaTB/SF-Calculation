@@ -34,28 +34,30 @@ for filename in os.listdir(input_folder):
                 lines = file.readlines()
             
             for line in lines:
-                if line.strip().startswith("Excited State"):
-                    # Regex to extract state type and energy
+                 if line.strip().startswith("Excited State"):
                     match = re.search(r'Excited State\s+\d+:\s+(\w+)-\w+\s+([\d.]+)\s+eV', line)
+
                     if match:
-                        state_type = match.group(1)  # Singlet or Triplet
-                        energy = float(match.group(2))
+                      state_type = match.group(1)
+                      energy = float(match.group(2))
 
-                        if state_type == "Singlet" and not found_singlet:
-                            file_data["Singlet"] = energy
-                            found_singlet = True
-                            print(f"  → Singlet: {energy} eV")
-                        elif state_type == "Triplet" and not found_triplet:
-                            file_data["Triplet"] = energy
-                            found_triplet = True
-                            print(f"  → Triplet: {energy} eV")
+            if state_type == "Singlet" and not found_singlet:
+                file_data["Singlet"] = energy
+                found_singlet = True
+                print(f"{filename} → Singlet: {energy} eV")
 
-                if found_singlet and found_triplet:
-                    break
-         # Add second triplet if available
+            elif state_type == "Triplet":
+                triplet_energies.append(energy)
+                print(f"{filename} → Triplet found: {energy} eV")
+
+
+            if len(triplet_energies) > 0:
+                file_data["Triplet"] = triplet_energies[0]
             if len(triplet_energies) > 1:
                 file_data["Triplet2"] = triplet_energies[1]
+
                 
+            
             for i, line in enumerate(lines):
                     if "Alpha  occ. eigenvalues" in line:
                         parts = line.strip().split("--")
